@@ -1,8 +1,7 @@
-Shower
-run
-run
-run
-Gooning
-Rugby
-Hide
-Cook
+S
+Show
+add
+New tasks is added
+Run
+Cooking Dinner
+Phone call
