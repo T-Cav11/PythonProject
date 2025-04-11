@@ -1,6 +1,10 @@
 import Functions
 import FreeSimpleGUI as sg
+import time
 
+sg.theme("Reddit")
+
+clock = sg.Text("", key="clock")
 label =sg.Text("Type in a task")
 input_box = sg.InputText(tooltip="Enter task: ", key = "task")
 add_task_button = sg.Button("Add")
@@ -11,16 +15,16 @@ complete_button = sg.Button("Complete")
 exit_button = sg.Button("Exit")
 
 window = sg.Window("Tasks to be completed",
-                   [[label],
+                   [[clock],
+                    [label],
                     [input_box, add_task_button],
                     [list_box, edit_button, complete_button,],
                     [exit_button]],
                    font= ("Helvetica", 11))
 
 while True:
-    event, values = window.read()
-    print(1,event)
-    print(2,values)
+    event, values = window.read(timeout=200)
+    window["clock"].update(value=time.strftime("%b %d, %Y %H:%M:%S"))
     match event:
         case "Add":
             tasks = Functions.get_tasks()
@@ -29,22 +33,28 @@ while True:
             Functions.write_tasks(tasks)
             window["existing_tasks"].update(tasks)
         case "Edit":
-            task_to_edit = values["existing_tasks"][0]
-            new_task = values["task"]
+            try:
+                task_to_edit = values["existing_tasks"][0]
+                new_task = values["task"]
 
-            tasks = Functions.get_tasks()
-            index = tasks.index(task_to_edit)
-            tasks[index] = new_task + "\n"
-            Functions.write_tasks(tasks)
-            window["existing_tasks"].update(tasks)
+                tasks = Functions.get_tasks()
+                index = tasks.index(task_to_edit)
+                tasks[index] = new_task + "\n"
+                Functions.write_tasks(tasks)
+                window["existing_tasks"].update(tasks)
+            except IndexError:
+                sg.popup("Please select an item first.", font=("Helvetica", 11))
 
         case "Complete":
-            task_to_complete = values["existing_tasks"][0]
-            tasks = Functions.get_tasks()
-            tasks.remove(task_to_complete)
-            Functions.write_tasks(tasks)
-            window["existing_tasks"].update(values=tasks)
-            window["task"].update(value="")
+            try:
+                task_to_complete = values["existing_tasks"][0]
+                tasks = Functions.get_tasks()
+                tasks.remove(task_to_complete)
+                Functions.write_tasks(tasks)
+                window["existing_tasks"].update(values=tasks)
+                window["task"].update(value="")
+            except IndexError:
+                sg.popup("Please select an item first.", font=("Helvetica", 11))
 
 
         case "existing_tasks":
