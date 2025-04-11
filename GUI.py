@@ -7,9 +7,14 @@ add_task_button = sg.Button("Add")
 list_box = sg.Listbox(Functions.get_tasks(), key = "existing_tasks",
                       enable_events =  True, size = [45, 10])
 edit_button = sg.Button("Edit")
+complete_button = sg.Button("Complete")
+exit_button = sg.Button("Exit")
 
 window = sg.Window("Tasks to be completed",
-                   [[label], [input_box, add_task_button], [list_box, edit_button]],
+                   [[label],
+                    [input_box, add_task_button],
+                    [list_box, edit_button, complete_button,],
+                    [exit_button]],
                    font= ("Helvetica", 11))
 
 while True:
@@ -32,8 +37,21 @@ while True:
             tasks[index] = new_task + "\n"
             Functions.write_tasks(tasks)
             window["existing_tasks"].update(tasks)
+
+        case "Complete":
+            task_to_complete = values["existing_tasks"][0]
+            tasks = Functions.get_tasks()
+            tasks.remove(task_to_complete)
+            Functions.write_tasks(tasks)
+            window["existing_tasks"].update(values=tasks)
+            window["task"].update(value="")
+
+
         case "existing_tasks":
           window["task"].update(values["existing_tasks"][0].strip())
+
+        case "Exit":
+            break
 
         case sg.WIN_CLOSED:
             break
